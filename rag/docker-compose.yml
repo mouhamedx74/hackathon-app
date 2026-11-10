@@ -1,0 +1,97 @@
+# Lancement de toute la stack en une commande :
+#     docker compose up --build
+#
+# Services :
+#   ollama       serveur de modèles (embeddings + LLM)
+#   ollama-pull  télécharge les modèles une fois, puis s'arrête
+#   api          FastAPI + ChromaDB embarqué (ingestion au démarrage)
+#   open-webui   interface de chat branchée sur Ollama
+#   ngrok        tunnel public vers l'API (dev), dashboard sur http://localhost:4040
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    healthcheck:
+      # L'image n'a pas curl : on utilise le CLI ollama pour tester le serveur
+      test: ["CMD", "ollama", "list"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  ollama-pull:
+    image: ollama/ollama:latest
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    entrypoint: ["sh", "-c", "ollama pull ${EMBED_MODEL:-nomic-embed-text} && ollama pull ${LLM_MODEL:-qwen2.5:1.5b}"]
+    depends_on:
+      ollama:
+        condition: service_healthy
+
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+      - CHROMA_DIR=/app/chroma_db
+    depends_on:
+      ollama:
+        condition: service_healthy
+      ollama-pull:
+        condition: service_completed_successfully
+    volumes:
+      - chroma_data:/app/chroma_db
+      - ./data:/app/data
+    restart: unless-stopped
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    ports:
+      - "3000:8080"
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+    volumes:
+      - open-webui:/app/backend/data
+    depends_on:
+      - ollama
+    restart: unless-stopped
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    # Wrapper shell plutôt que la commande brute :
+    #  - sans NGROK_AUTHTOKEN, le service s'arrête proprement (le reste de la stack tourne quand même)
+    #  - --url n'est ajouté que si NGROK_DOMAIN est défini (sinon URL aléatoire à chaque restart)
+    # Les $$ empêchent docker compose d'interpréter les variables : c'est le shell du conteneur qui le fait.
+    entrypoint:
+      - sh
+      - -c
+      - |
+        if [ -z "$$NGROK_AUTHTOKEN" ]; then
+          echo "NGROK_AUTHTOKEN absent dans .env : tunnel ngrok désactivé."
+          exit 0
+        fi
+        exec ngrok http api:8000 --config=/var/lib/ngrok/ngrok.yml --log=stdout $${NGROK_DOMAIN:+--url=$$NGROK_DOMAIN}
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN:-}
+      - NGROK_DOMAIN=${NGROK_DOMAIN:-}
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    ports:
+      - "4040:4040"    # dashboard ngrok local (requêtes en temps réel)
+    depends_on:
+      - api
+    restart: on-failure  # relance si ngrok plante, mais pas après l'arrêt volontaire sans token
+
+volumes:
+  ollama_data:
+  chroma_data:
+  open-webui:
