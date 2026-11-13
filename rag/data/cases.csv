@@ -1,0 +1,31 @@
+trend,persistence,growth,diversity,diffusion,adoption,viral_spike,fit,timing,label
+vanille gourmande,92,60,88,85,88,0.05,85,70,durable
+oud / bois d'oud,88,62,78,80,70,0.10,80,65,durable
+musc blanc,90,55,82,78,75,0.05,82,60,durable
+rose (parfumerie),95,40,90,88,85,0.00,78,55,durable
+matcha,80,78,80,82,72,0.20,85,80,durable
+yuzu,75,65,70,68,55,0.10,80,72,durable
+gingembre,90,50,92,85,82,0.05,75,50,durable
+café (notes cafe),88,58,84,80,80,0.05,72,60,durable
+fermentés kimchi-kéfir,78,70,76,72,60,0.15,70,75,durable
+lait d'avoine,72,82,74,78,78,0.25,76,70,durable
+protéines végétales,76,80,82,80,66,0.20,78,78,durable
+cold brew,74,68,70,76,70,0.20,68,66,durable
+notes boisées (cèdre),90,52,80,78,76,0.05,80,58,durable
+cardamome,70,60,72,64,52,0.10,74,66,durable
+kombucha,66,58,64,70,58,0.30,66,52,durable
+dalgona coffee,8,30,18,45,30,0.95,35,10,buzz
+cronut,12,25,20,40,35,0.90,30,8,buzz
+food licorne,10,22,15,38,28,0.92,28,6,buzz
+charbon actif (food),18,28,24,42,26,0.85,32,12,buzz
+bagel arc-en-ciel,9,20,14,36,24,0.93,25,5,buzz
+bulletproof coffee,28,34,30,48,35,0.70,40,20,buzz
+boissons CBD,40,48,42,52,38,0.65,45,35,buzz
+cosmétiques pailletés,24,30,28,46,34,0.75,38,18,buzz
+jus de céleri,32,40,30,50,36,0.80,42,24,buzz
+régime pegan,20,26,22,34,24,0.70,30,14,buzz
+lait de céréales,26,32,28,44,30,0.78,34,16,buzz
+dentifrice au charbon,22,28,20,40,26,0.80,30,12,buzz
+glace noire,14,24,16,38,22,0.88,26,8,buzz
+hard seltzer saveurs,42,46,40,56,48,0.60,50,30,buzz
+huiles essentielles miracle,36,38,34,50,40,0.68,44,26,buzz
